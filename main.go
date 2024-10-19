@@ -3,7 +3,7 @@ package go_digest
 import (
 	"math"
 	"math/cmplx"
-	"slices"
+	"math/rand/v2"
 	"unsafe"
 )
 
@@ -60,14 +60,43 @@ func GetRootsOfQuadraticEquation(a, b, c float64) (complex128, complex128) {
 	return x1, x2
 }
 
+func partition(arr []int, low, high int) ([]int, int) {
+	pivot := arr[high]
+	i := low
+	for j := low; j < high; j++ {
+		if arr[j] < pivot {
+			arr[i], arr[j] = arr[j], arr[i]
+			i++
+		}
+	}
+	arr[i], arr[high] = arr[high], arr[i]
+	return arr, i
+}
+
+func quickSort(arr []int, low, high int) []int {
+	if low < high {
+		var p int
+		arr, p = partition(arr, low, high)
+		arr = quickSort(arr, low, p-1)
+		arr = quickSort(arr, p+1, high)
+	}
+	return arr
+}
+
 // Sort sorts in-place the given slice of integers in ascending order.
 func Sort(source []int) {
-	slices.Sort(source)
+	rand.Shuffle(len(source), func(i, j int) {
+		source[i], source[j] = source[j], source[i]
+	})
+	quickSort(source, 0, len(source)-1)
 }
 
 // ReverseSliceOne in-place reverses the order of elements in the given slice.
 func ReverseSliceOne(s []int) {
-	slices.Reverse(s)
+	for i := 0; i < len(s)/2; i++ {
+		pair := len(s) - i - 1
+		s[i], s[pair] = s[pair], s[i]
+	}
 }
 
 // ReverseSliceTwo returns a new slice of integers with elements in reverse order compared to the input slice.
@@ -76,7 +105,7 @@ func ReverseSliceTwo(s []int) []int {
 	result := make([]int, len(s))
 	copy(result, s)
 
-	slices.Reverse(result)
+	ReverseSliceOne(result)
 
 	return result
 }
@@ -88,7 +117,15 @@ func SwapPointers(a, b *int) {
 
 // IsSliceEqual compares two slices of integers and returns true if they contain the same elements in the same order.
 func IsSliceEqual(a, b []int) bool {
-	return slices.Equal(a, b)
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // DeleteByIndex deletes the element at the specified index from the slice and returns a new slice.
