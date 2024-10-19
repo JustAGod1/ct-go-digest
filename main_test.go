@@ -1,6 +1,7 @@
 package go_digest
 
 import (
+	"fmt"
 	"math"
 	"math/cmplx"
 	"math/rand/v2"
@@ -416,7 +417,11 @@ func TestIsComplexEqual(t *testing.T) {
 
 			actual := IsComplexEqual(tc.a, tc.b)
 
-			require.Equal(t, tc.expected, actual)
+			require.Equal(t, tc.expected, actual,
+				fmt.Sprintf("Expected %f + %fi == %f + %fi be %v",
+					real(tc.a), imag(tc.a),
+					real(tc.b), imag(tc.b),
+					tc.expected))
 		})
 	}
 }
